@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 1%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 271 69% 62%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 188 91% 43%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 243 75% 59%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-obsidian text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10;
+  }
+
+  .glass-panel-hover {
+    @apply glass-panel hover:bg-white/10 transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-electric-indigo via-electric-purple to-electric-cyan bg-clip-text text-transparent;
+  }
+
+  .glow-indigo {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030303;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}

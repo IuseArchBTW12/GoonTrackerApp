@@ -18,9 +18,9 @@ const config: Config = {
           900: "#000000",
         },
         electric: {
-          indigo: "#6366f1",
-          purple: "#a855f7",
-          cyan: "#06b6d4",
+          indigo: "var(--color-primary)",
+          purple: "var(--color-secondary)",
+          cyan: "var(--color-accent)",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

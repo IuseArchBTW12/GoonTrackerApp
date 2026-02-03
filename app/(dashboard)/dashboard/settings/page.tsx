@@ -7,8 +7,9 @@ import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, User, Bell, Shield, CreditCard, Download, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, Shield, CreditCard, Download, Loader2, Palette } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
+import { THEMES, applyTheme, type ThemeName } from "@/lib/themes";
 
 export default function SettingsPage() {
   const { user } = useUser();
@@ -31,10 +32,18 @@ export default function SettingsPage() {
   const updateProfile = useMutation(api.userSettings.updateProfile);
   const updateNotification = useMutation(api.userSettings.updateNotificationSettings);
   const updatePrivacy = useMutation(api.userSettings.updatePrivacySettings);
+  const updateThemeMutation = useMutation(api.userSettings.updateTheme);
   const exportData = useQuery(api.userSettings.exportUserData,
     currentUser ? { userId: currentUser._id } : "skip"
   );
   const deleteAccount = useMutation(api.userSettings.deleteUserAccount);
+
+  // Apply theme on load
+  useEffect(() => {
+    if (settings?.theme) {
+      applyTheme(settings.theme as ThemeName);
+    }
+  }, [settings?.theme]);
 
   // Initialize form values when user data loads
   useEffect(() => {
@@ -90,6 +99,20 @@ export default function SettingsPage() {
       });
     } catch (error) {
       console.error("Failed to update privacy:", error);
+    }
+  };
+
+  const handleThemeChange = async (theme: ThemeName) => {
+    if (!currentUser) return;
+    
+    try {
+      applyTheme(theme);
+      await updateThemeMutation({
+        userId: currentUser._id,
+        theme,
+      });
+    } catch (error) {
+      console.error("Failed to update theme:", error);
     }
   };
 
@@ -210,6 +233,55 @@ export default function SettingsPage() {
               "Save Profile"
             )}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Theme Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-electric-cyan" />
+            UI Theme
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-400 mb-4">
+            Choose a theme that matches your vibe
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {Object.entries(THEMES).map(([key, theme]) => {
+              const isActive = settings.theme === key || (!settings.theme && key === "dark");
+              return (
+                <button
+                  key={key}
+                  onClick={() => handleThemeChange(key as ThemeName)}
+                  className={`p-4 rounded-xl transition-all ${
+                    isActive
+                      ? "ring-2 ring-electric-indigo bg-electric-indigo/20"
+                      : "glass-panel hover:bg-white/10"
+                  }`}
+                >
+                  <div className="text-3xl mb-2">{theme.icon}</div>
+                  <div className="text-sm font-semibold mb-1">{theme.name}</div>
+                  <div className="text-xs text-gray-400">{theme.description}</div>
+                  <div className="flex gap-1 mt-2 justify-center">
+                    <div
+                      className="w-4 h-4 rounded-full border border-white/20"
+                      style={{ backgroundColor: theme.colors.primary }}
+                    />
+                    <div
+                      className="w-4 h-4 rounded-full border border-white/20"
+                      style={{ backgroundColor: theme.colors.secondary }}
+                    />
+                    <div
+                      className="w-4 h-4 rounded-full border border-white/20"
+                      style={{ backgroundColor: theme.colors.accent }}
+                    />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 

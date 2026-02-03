@@ -158,6 +158,18 @@ export default defineSchema({
   // User Settings
   userSettings: defineTable({
     userId: v.id("users"),
+    theme: v.optional(v.union(
+      v.literal("dark"),
+      v.literal("light"),
+      v.literal("original"),
+      v.literal("gay"),
+      v.literal("lesbian"),
+      v.literal("trans"),
+      v.literal("femboy"),
+      v.literal("bi"),
+      v.literal("pan"),
+      v.literal("ace")
+    )),
     notifications: v.object({
       sessionReminders: v.boolean(),
       streakAlerts: v.boolean(),

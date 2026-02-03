@@ -36,6 +36,7 @@ export const getUserSettings = query({
 
     return settings || {
       userId: args.userId,
+      theme: "dark",
       notifications: {
         sessionReminders: true,
         streakAlerts: true,
@@ -49,6 +50,56 @@ export const getUserSettings = query({
         anonymousMode: false,
       },
     };
+  },
+});
+
+// Update theme
+export const updateTheme = mutation({
+  args: {
+    userId: v.id("users"),
+    theme: v.union(
+      v.literal("dark"),
+      v.literal("light"),
+      v.literal("original"),
+      v.literal("gay"),
+      v.literal("lesbian"),
+      v.literal("trans"),
+      v.literal("femboy"),
+      v.literal("bi"),
+      v.literal("pan"),
+      v.literal("ace")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("userSettings")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        theme: args.theme,
+      });
+    } else {
+      await ctx.db.insert("userSettings", {
+        userId: args.userId,
+        theme: args.theme,
+        notifications: {
+          sessionReminders: true,
+          streakAlerts: true,
+          leaderboardUpdates: false,
+          aiCoachInsights: true,
+          achievementUnlocks: true,
+        },
+        privacy: {
+          profileVisibility: true,
+          showStatsPublicly: false,
+          anonymousMode: false,
+        },
+      });
+    }
+
+    return { success: true };
   },
 });
 

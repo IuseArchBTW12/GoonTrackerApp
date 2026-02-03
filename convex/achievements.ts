@@ -115,6 +115,60 @@ export const ACHIEVEMENTS = {
     icon: "🎮",
     category: "special",
   },
+  femboy_gooning: {
+    name: "Femboy Gooner 💕",
+    description: "Complete a special femboy session",
+    icon: "💕",
+    category: "special",
+  },
+  marathon_master: {
+    name: "Marathon Master 🏃",
+    description: "Complete a single session over 2 hours",
+    icon: "🏃",
+    category: "duration",
+  },
+  speed_demon: {
+    name: "Speed Demon ⚡",
+    description: "Complete 3 sessions in one day",
+    icon: "⚡",
+    category: "special",
+  },
+  consistency_king: {
+    name: "Consistency King 👑",
+    description: "Complete at least one session every day for a week",
+    icon: "👑",
+    category: "streak",
+  },
+  intensity_shifter: {
+    name: "Intensity Shifter 🎚️",
+    description: "Change intensity during a session 5+ times",
+    icon: "🎚️",
+    category: "intensity",
+  },
+  midnight_gooner: {
+    name: "Midnight Gooner 🌙",
+    description: "Complete a session exactly at midnight",
+    icon: "🌙",
+    category: "special",
+  },
+  social_butterfly: {
+    name: "Social Butterfly 🦋",
+    description: "Share your stats on the leaderboard 10 times",
+    icon: "🦋",
+    category: "special",
+  },
+  perfectionist: {
+    name: "Perfectionist ✨",
+    description: "Complete a session with exactly 69 minutes",
+    icon: "✨",
+    category: "special",
+  },
+  legend: {
+    name: "Legend Status 🌟",
+    description: "Unlock 20 achievements",
+    icon: "🌟",
+    category: "milestone",
+  },
 };
 
 // Check and unlock achievements for a user
@@ -213,6 +267,43 @@ export const checkAndUnlockAchievements = mutation({
       return day === 0 || day === 6; // Sunday or Saturday
     });
     if (weekendSessions.length >= 10) await unlock("weekend_warrior");
+
+    // Marathon master - single session over 2 hours
+    const marathonSessions = sessions.filter((s) => (s.duration || 0) > 7200);
+    if (marathonSessions.length >= 1) await unlock("marathon_master");
+
+    // Perfectionist - exactly 69 minutes
+    const perfectSessions = sessions.filter((s) => {
+      const minutes = Math.floor((s.duration || 0) / 60);
+      return minutes === 69;
+    });
+    if (perfectSessions.length >= 1) await unlock("perfectionist");
+
+    // Speed demon - 3 sessions in one day
+    const sessionsByDay: { [key: string]: number } = {};
+    sessions.forEach((s) => {
+      const dateKey = new Date(s.startTime).toDateString();
+      sessionsByDay[dateKey] = (sessionsByDay[dateKey] || 0) + 1;
+    });
+    if (Object.values(sessionsByDay).some((count) => count >= 3)) {
+      await unlock("speed_demon");
+    }
+
+    // Midnight gooner - session at exactly midnight
+    const midnightSessions = sessions.filter((s) => {
+      const date = new Date(s.startTime);
+      return date.getHours() === 0 && date.getMinutes() === 0;
+    });
+    if (midnightSessions.length >= 1) await unlock("midnight_gooner");
+
+    // Legend status - 20 achievements unlocked
+    if (unlockedAchievements.length >= 20) await unlock("legend");
+
+    // Femboy-gooning - check for femboy tag
+    const femboyTagSessions = sessions.filter((s) => 
+      s.tags?.includes("femboy") || s.tags?.includes("femboy-gooning")
+    );
+    if (femboyTagSessions.length >= 1) await unlock("femboy_gooning");
 
     return { unlocked: newlyUnlocked };
   },

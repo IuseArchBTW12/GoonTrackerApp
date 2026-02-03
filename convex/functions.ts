@@ -122,6 +122,24 @@ export const endSession = mutation({
   },
 });
 
+// Update session intensity during active session
+export const updateSessionIntensity = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    intensity: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.sessionId);
+    if (!session || session.endTime) return null; // Can't update ended sessions
+
+    await ctx.db.patch(args.sessionId, {
+      intensity: args.intensity,
+    });
+
+    return { success: true };
+  },
+});
+
 // Get user sessions
 export const getUserSessions = query({
   args: {

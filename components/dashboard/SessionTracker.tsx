@@ -20,9 +20,22 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
   const [intensity, setIntensity] = useState(7);
   const [duration, setDuration] = useState(0);
   const [notes, setNotes] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>(["manual"]);
 
   const startSession = useMutation(api.functions.startSession);
   const endSession = useMutation(api.functions.endSession);
+  const updateSessionIntensity = useMutation(api.functions.updateSessionIntensity);
+
+  const availableTags = [
+    "manual",
+    "femboy-gooning",
+    "edging",
+    "marathon",
+    "quick",
+    "focus",
+    "relax",
+    "challenge",
+  ];
 
   // Timer effect
   useEffect(() => {
@@ -40,7 +53,7 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
       const id = await startSession({
         userId,
         intensity,
-        tags: ["manual"],
+        tags: selectedTags,
         mood: "focused",
       });
       setSessionId(id);
@@ -63,6 +76,7 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
       setSessionId(null);
       setNotes("");
       setDuration(0);
+      setSelectedTags(["manual"]);
     } catch (error) {
       console.error("Failed to end session:", error);
       alert("Failed to end session. Please try again.");
@@ -99,7 +113,7 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-semibold text-gray-300">
-              Intensity Level
+              Intensity Level {isActive && <span className="text-xs text-electric-cyan ml-2">(Live)</span>}
             </label>
             <span className="text-sm font-bold text-electric-indigo">
               {intensity}/10
@@ -110,9 +124,18 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
             min="1"
             max="10"
             value={intensity}
-            onChange={(e) => setIntensity(parseInt(e.target.value))}
-            disabled={isActive}
-            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+            onChange={async (e) => {
+              const newIntensity = parseInt(e.target.value);
+              setIntensity(newIntensity);
+              // Update intensity in real-time during active session
+              if (isActive && sessionId) {
+                await updateSessionIntensity({
+                  sessionId,
+                  intensity: newIntensity,
+                });
+              }
+            }}
+            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
             style={{
               background: `linear-gradient(to right, #6366f1 0%, #6366f1 ${intensity * 10}%, rgba(255,255,255,0.1) ${intensity * 10}%, rgba(255,255,255,0.1) 100%)`,
             }}
@@ -122,7 +145,45 @@ export default function SessionTracker({ userId }: SessionTrackerProps) {
             <span>Moderate</span>
             <span>Maximum</span>
           </div>
+          {isActive && (
+            <p className="text-xs text-electric-cyan animate-pulse">
+              ✨ You can adjust intensity during your session
+            </p>
+          )}
         </div>
+
+        {/* Session Tags */}
+        {!isActive && (
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-300">
+              Session Tags
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    if (selectedTags.includes(tag)) {
+                      setSelectedTags(selectedTags.filter((t) => t !== tag));
+                    } else {
+                      setSelectedTags([...selectedTags, tag]);
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    selectedTags.includes(tag)
+                      ? "bg-electric-indigo text-white"
+                      : "bg-white/10 text-gray-400 hover:bg-white/20"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500">
+              Select tags to categorize your session
+            </p>
+          </div>
+        )}
 
         {/* Notes */}
         {isActive && (

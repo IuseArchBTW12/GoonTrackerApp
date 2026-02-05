@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Trophy, BarChart3, Settings, Award } from "lucide-react";
+import { Activity, Trophy, BarChart3, Settings, Award, Users } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -16,6 +16,7 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Activity },
+    { name: "Community", href: "/dashboard/community", icon: Users },
     { name: "Leaderboard", href: "/dashboard/leaderboard", icon: Trophy },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Achievements", href: "/dashboard/achievements", icon: Award },

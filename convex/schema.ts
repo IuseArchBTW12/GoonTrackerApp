@@ -184,4 +184,49 @@ export default defineSchema({
     }),
   })
     .index("by_user", ["userId"]),
+
+  // Community Posts (Twitter-like)
+  posts: defineTable({
+    userId: v.id("users"),
+    content: v.string(),
+    mediaUrl: v.optional(v.string()), // Video/image URL
+    mediaType: v.optional(v.union(v.literal("image"), v.literal("video"))),
+    createdAt: v.number(),
+    likeCount: v.number(),
+    commentCount: v.number(),
+    shareCount: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_created_at", ["createdAt"]),
+
+  // Post Likes
+  postLikes: defineTable({
+    postId: v.id("posts"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_user", ["userId"])
+    .index("by_post_and_user", ["postId", "userId"]),
+
+  // Post Comments
+  postComments: defineTable({
+    postId: v.id("posts"),
+    userId: v.id("users"),
+    content: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_user", ["userId"])
+    .index("by_post_and_time", ["postId", "createdAt"]),
+
+  // Post Shares/Retweets
+  postShares: defineTable({
+    postId: v.id("posts"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_user", ["userId"])
+    .index("by_post_and_user", ["postId", "userId"]),
 });

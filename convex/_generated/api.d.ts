@@ -11,6 +11,7 @@
 import type * as achievements from "../achievements.js";
 import type * as aiActions from "../aiActions.js";
 import type * as aiChat from "../aiChat.js";
+import type * as community from "../community.js";
 import type * as functions from "../functions.js";
 import type * as userSettings from "../userSettings.js";
 
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   achievements: typeof achievements;
   aiActions: typeof aiActions;
   aiChat: typeof aiChat;
+  community: typeof community;
   functions: typeof functions;
   userSettings: typeof userSettings;
 }>;

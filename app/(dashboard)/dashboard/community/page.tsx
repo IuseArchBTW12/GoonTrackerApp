@@ -296,18 +296,25 @@ function PostCard({
 
         {/* Media */}
         {post.mediaUrl && (
-          <div className="rounded-xl overflow-hidden border border-white/10">
+          <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
             {post.mediaType === "video" ? (
               <video
                 src={post.mediaUrl}
                 controls
-                className="w-full max-h-96 object-cover"
-              />
+                className="w-full max-h-96 object-contain bg-black"
+                preload="metadata"
+                playsInline
+              >
+                <source src={post.mediaUrl} type="video/mp4" />
+                <source src={post.mediaUrl} type="video/webm" />
+                <source src={post.mediaUrl} type="video/ogg" />
+                Your browser does not support the video tag.
+              </video>
             ) : (
               <img
                 src={post.mediaUrl}
                 alt="Post media"
-                className="w-full max-h-96 object-cover"
+                className="w-full max-h-96 object-contain"
               />
             )}
           </div>

@@ -65,13 +65,13 @@ export default function Pricing() {
   ];
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden">
+    <section className="py-32 px-4 relative overflow-hidden" suppressHydrationWarning>
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-electric-indigo/5 to-obsidian" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-electric-indigo/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-electric-purple/10 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-electric-indigo/5 to-obsidian" suppressHydrationWarning />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-electric-indigo/10 rounded-full blur-3xl" suppressHydrationWarning />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-electric-purple/10 rounded-full blur-3xl" suppressHydrationWarning />
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10" suppressHydrationWarning>
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black text-gradient mb-4">

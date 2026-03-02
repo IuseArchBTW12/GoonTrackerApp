@@ -110,9 +110,10 @@ export default function Hero() {
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden px-4"
+      suppressHydrationWarning
     >
       {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-electric-indigo/10 via-obsidian to-obsidian" />
+      <div className="absolute inset-0 bg-gradient-to-b from-electric-indigo/10 via-obsidian to-obsidian" suppressHydrationWarning />
 
       {/* Grid overlay */}
       <div

@@ -7,7 +7,7 @@ import Pricing from "@/components/landing/Pricing";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-obsidian">
+    <main className="min-h-screen bg-obsidian" suppressHydrationWarning>
       <Hero />
       <BentoPreview />
       <Features />

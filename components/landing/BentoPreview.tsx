@@ -46,7 +46,7 @@ export default function BentoPreview() {
   }, [isMounted]);
 
   return (
-    <section ref={bentoRef} className="py-32 px-4">
+    <section ref={bentoRef} className="py-32 px-4" suppressHydrationWarning>
       <div className="max-w-7xl mx-auto">
         <h2 className="text-5xl font-black text-center mb-4 text-gradient">
           Built for Peak Gooning Performance

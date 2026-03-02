@@ -35,8 +35,8 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-32 px-4 bg-gradient-to-b from-obsidian to-obsidian-100">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-32 px-4 bg-gradient-to-b from-obsidian to-obsidian-100" suppressHydrationWarning>
+      <div className="max-w-7xl mx-auto" suppressHydrationWarning>
         <h2 className="text-5xl font-black text-center mb-4 text-gradient">
           Everything You Need for Elite Gooning
         </h2>

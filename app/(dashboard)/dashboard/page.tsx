@@ -15,50 +15,34 @@ import { Button } from "@/components/ui/button";
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const [error, setError] = useState<string | null>(null);
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [showChat, setShowChat] = useState(false);
-  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
-  const currentUser = useQuery(
-    api.functions.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip"
-  );
-  
-  const createUser = useMutation(api.functions.createUser);
+  const getOrCreateUser = useMutation(api.functions.getOrCreateUser);
 
-  // Set a timeout for loading state
+  // Auto-create/fetch user when Clerk user is loaded
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (currentUser === undefined) {
-        setLoadingTimeout(true);
-      }
-    }, 10000); // 10 seconds timeout
-
-    return () => clearTimeout(timer);
-  }, [currentUser]);
-
-  // Auto-create user if they don't exist in Convex yet
-  useEffect(() => {
-    if (isLoaded && user && currentUser === null && !isCreatingUser) {
-      setIsCreatingUser(true);
-      createUser({
+    if (isLoaded && user && isLoadingUser) {
+      getOrCreateUser({
         clerkId: user.id,
         email: user.emailAddresses[0]?.emailAddress || "",
         name: user.fullName || undefined,
         imageUrl: user.imageUrl || undefined,
         username: user.username || undefined,
       })
-        .then(() => {
-          console.log("User created in Convex");
-          setIsCreatingUser(false);
+        .then((userData) => {
+          console.log("User loaded/created:", userData);
+          setCurrentUser(userData);
+          setIsLoadingUser(false);
         })
         .catch((err) => {
-          console.error("Failed to create user:", err);
-          setError("Failed to create your account. Please try refreshing.");
-          setIsCreatingUser(false);
+          console.error("Failed to load/create user:", err);
+          setError("Failed to load your account. Please try refreshing.");
+          setIsLoadingUser(false);
         });
     }
-  }, [isLoaded, user, currentUser, createUser, isCreatingUser]);
+  }, [isLoaded, user, isLoadingUser, getOrCreateUser]);
 
   // Handle errors
   useEffect(() => {
@@ -96,29 +80,6 @@ export default function DashboardPage() {
 
   // Show loading while Clerk loads
   if (!isLoaded) {
-    if (loadingTimeout) {
-      return (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center glass-panel p-8 rounded-2xl max-w-md">
-            <p className="text-2xl mb-4">⚠️</p>
-            <p className="text-red-500 font-semibold mb-2">Connection timeout</p>
-            <p className="text-gray-400 mb-4">
-              Unable to connect to the backend. Please make sure Convex is running.
-            </p>
-            <div className="space-y-2 text-left text-sm text-gray-500 mb-4">
-              <p>Run: <code className="bg-white/10 px-2 py-1 rounded">npx convex dev</code></p>
-            </div>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-electric-indigo rounded-xl hover:bg-electric-indigo/90 transition-all"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
@@ -129,22 +90,20 @@ export default function DashboardPage() {
     );
   }
 
-  // Show loading while fetching user data or creating user
-  if (currentUser === undefined || isCreatingUser) {
+  // Show loading while fetching/creating user data
+  if (isLoadingUser) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-electric-indigo mx-auto mb-4" />
-          <p className="text-gray-400">
-            {isCreatingUser ? "Setting up your account..." : "Loading your dashboard..."}
-          </p>
+          <p className="text-gray-400">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   // This shouldn't happen anymore, but keep as fallback
-  if (currentUser === null) {
+  if (!currentUser) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center glass-panel p-8 rounded-2xl max-w-md">

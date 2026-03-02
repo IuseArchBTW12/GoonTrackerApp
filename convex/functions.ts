@@ -59,6 +59,48 @@ export const getCurrentUser = query({
   },
 });
 
+// Get or create user (auto-creates if doesn't exist)
+export const getOrCreateUser = mutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    username: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (existingUser) {
+      // Update last active time
+      await ctx.db.patch(existingUser._id, {
+        lastActive: Date.now(),
+      });
+      return existingUser;
+    }
+
+    // Create new user
+    const userId = await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      email: args.email,
+      name: args.name,
+      imageUrl: args.imageUrl,
+      username: args.username,
+      tier: "free",
+      createdAt: Date.now(),
+      lastActive: Date.now(),
+      totalSessions: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+    });
+
+    return await ctx.db.get(userId);
+  },
+});
+
 // Start a new session
 export const startSession = mutation({
   args: {

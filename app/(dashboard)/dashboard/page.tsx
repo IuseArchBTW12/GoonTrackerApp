@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   const currentUser = useQuery(
     api.functions.getCurrentUser,
@@ -24,6 +25,17 @@ export default function DashboardPage() {
   );
   
   const createUser = useMutation(api.functions.createUser);
+
+  // Set a timeout for loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (currentUser === undefined) {
+        setLoadingTimeout(true);
+      }
+    }, 10000); // 10 seconds timeout
+
+    return () => clearTimeout(timer);
+  }, [currentUser]);
 
   // Auto-create user if they don't exist in Convex yet
   useEffect(() => {
@@ -84,6 +96,29 @@ export default function DashboardPage() {
 
   // Show loading while Clerk loads
   if (!isLoaded) {
+    if (loadingTimeout) {
+      return (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center glass-panel p-8 rounded-2xl max-w-md">
+            <p className="text-2xl mb-4">⚠️</p>
+            <p className="text-red-500 font-semibold mb-2">Connection timeout</p>
+            <p className="text-gray-400 mb-4">
+              Unable to connect to the backend. Please make sure Convex is running.
+            </p>
+            <div className="space-y-2 text-left text-sm text-gray-500 mb-4">
+              <p>Run: <code className="bg-white/10 px-2 py-1 rounded">npx convex dev</code></p>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-electric-indigo rounded-xl hover:bg-electric-indigo/90 transition-all"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
